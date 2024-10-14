@@ -238,7 +238,7 @@
             <h3>${songTitle}</h3>
             <p>Artist: ${artistName}</p>
           </div>
-          <button class="vote-button" id="vote-${resultItemId}" onclick="openVoteModal('${songTitle}', '${artistName}', '${thumbnail}', '${songLink}', ${resultItemId})">Vote</button>
+          <button class="vote-button" id="vote-${resultItemId}" onclick="openVoteModal('${songTitle}', '${artistName}', '${thumbnail}', '${songLink}', ${resultItemId})">Bình chọn</button>
         `;
 
         resultsContainer.appendChild(resultItem);
@@ -257,7 +257,7 @@
     function submitVote() {
       const voterName = document.getElementById('voterName').value;
       if (!voterName.trim()) {
-        alert('Please enter your name!');
+        alert('Vui lòng nhập tên của bạn!');
         return;
       }
 
@@ -271,7 +271,7 @@
           const hasVoted = voters.some(voter => voter.name === voterName);
 
           if (hasVoted) {
-            alert('You have already voted!');
+            alert('Bạn đã bình chọn rồi!');
             return;
           }
 
@@ -326,7 +326,7 @@
                 <td>${vote.songTitle}</td>
                 <td>${vote.artistName}</td>
                 <td><img src="${vote.thumbnail}" alt="${vote.songTitle}" width="50"></td>
-                <td><a href="${vote.songLink}" target="_blank">Listen</a></td> <!-- Link nhạc -->
+                <td><a href="${vote.songLink}" target="_blank">Nghe thử</a></td> <!-- Link nhạc -->
                 <td>${voteCount}</td>
               `;
               voteTableBody.appendChild(row);

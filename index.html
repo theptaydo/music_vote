@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Music Search with Deezer</title>
+  <title>Music Vote with Firebase</title>
   <style>
     body {
       font-family: 'Poppins', sans-serif;
@@ -83,7 +83,6 @@
     /* Modal styles */
     .modal {
       display: none;
-      /* Hidden by default */
       position: fixed;
       z-index: 1;
       left: 0;
@@ -113,11 +112,31 @@
       padding: 10px;
       cursor: pointer;
     }
+
+    /* Table styles */
+    table {
+      width: 80%;
+      margin: 20px auto;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    th,
+    td {
+      padding: 12px;
+      border-bottom: 1px solid #ddd;
+    }
+
+    th {
+      background-color: #4CAF50;
+      color: white;
+    }
   </style>
 </head>
 
 <body>
 
+  <h1>Bình chọn nhạc KV Văn Phòng Công Ty</h1>
   <div class="search-box">
     <input type="text" id="searchQuery" placeholder="Enter song name..." oninput="debounceSearch()" />
   </div>
@@ -134,7 +153,22 @@
     </div>
   </div>
 
+  <!-- Table for votes -->
+  <table id="voteTable">
+    <thead>
+      <tr>
+        <th>STT</th>
+        <th>Tên bài hát</th>
+        <th>Ca sĩ</th>
+        <th>Ảnh</th>
+        <th>Số lượng vote</th>
+      </tr>
+    </thead>
+    <tbody id="voteTableBody"></tbody>
+  </table>
+
   <script>
+    const firebaseURL = 'https://music-vote-tsc-default-rtdb.firebaseio.com/votes'; // URL đến database của bạn
     let timeoutId;
     let currentSong = {}; // Object to store the current song info when voting
 
@@ -197,30 +231,88 @@
         return;
       }
 
-      // Save the vote information
-      const voteData = {
-        voterName: voterName,
-        songTitle: currentSong.songTitle,
-        artistName: currentSong.artistName,
-        thumbnail: currentSong.thumbnail,
-      };
+      // Đọc dữ liệu hiện tại từ Firebase trước khi cập nhật
+      fetch(`${firebaseURL}/${currentSong.songId}.json`)
+        .then(response => response.json())
+        .then(data => {
+          let voters = data && data.voter ? data.voter : [];
 
-      console.log('Vote submitted:', voteData);
+          // Kiểm tra xem voterName đã tồn tại trong danh sách chưa
+          const hasVoted = voters.some(voter => voter.name === voterName);
 
-      // Here you can send the voteData to the server or store it in local storage
+          if (hasVoted) {
+            alert('You have already voted!');
+            return;
+          }
 
-      // Disable the vote button and update UI
-      const voteButton = document.getElementById(`vote-${currentSong.songId}`);
-      voteButton.disabled = true;
-      voteButton.innerText = 'Voted';
+          // Nếu chưa vote, thêm vào danh sách
+          voters.push({ name: voterName });
 
-      closeModal(); // Close the modal after voting
+          // Thông tin vote cần lưu trữ
+          const voteData = {
+            voter: voters, // Lưu danh sách người vote
+            songTitle: currentSong.songTitle,
+            artistName: currentSong.artistName,
+            thumbnail: currentSong.thumbnail,
+          };
+
+          // Ghi dữ liệu mới vào Firebase
+          fetch(`${firebaseURL}/${currentSong.songId}.json`, {
+            method: 'PUT',
+            body: JSON.stringify(voteData),
+            headers: { 'Content-Type': 'application/json' }
+          })
+            .then(() => {
+              console.log('Vote submitted:', voteData);
+              // Cập nhật nút sau khi bỏ phiếu
+              const voteButton = document.getElementById(`vote-${currentSong.songId}`);
+              voteButton.disabled = true;
+              voteButton.innerText = 'Voted';
+              closeModal(); // Đóng modal sau khi bỏ phiếu
+              updateVoteTable(); // Cập nhật bảng sau khi vote
+            })
+            .catch(error => console.error('Error submitting vote:', error));
+        })
+        .catch(error => console.error('Error fetching vote data:', error));
+    }
+
+    function updateVoteTable() {
+      const voteTableBody = document.getElementById('voteTableBody');
+      voteTableBody.innerHTML = ''; // Xóa dữ liệu cũ
+
+      fetch(`${firebaseURL}.json`) // Đọc tất cả dữ liệu từ Firebase
+        .then(response => response.json())
+        .then(votesData => {
+          if (votesData) {
+            let stt = 1;
+            for (const songId in votesData) {
+              const vote = votesData[songId];
+              const voteCount = vote.voter ? vote.voter.length : 0;
+
+              const row = document.createElement('tr');
+              row.innerHTML = `
+                <td>${stt++}</td>
+                <td>${vote.songTitle}</td>
+                <td>${vote.artistName}</td>
+                <td><img src="${vote.thumbnail}" alt="${vote.songTitle}" width="50"></td>
+                <td>${voteCount}</td>
+              `;
+              voteTableBody.appendChild(row);
+            }
+          } else {
+            console.log('No votes found.');
+          }
+        })
+        .catch(error => console.error('Error fetching votes:', error));
     }
 
     function clearResults() {
       const resultsContainer = document.getElementById('results');
       resultsContainer.innerHTML = '';  // Xóa kết quả trước đó
     }
+
+    // Cập nhật bảng ngay khi trang được tải
+    updateVoteTable();
   </script>
 
 </body>

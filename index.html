@@ -10,6 +10,7 @@
       font-family: 'Poppins', sans-serif;
       background-color: #f0f0f0;
       text-align: center;
+      padding-bottom: 50px;
     }
 
     .search-box {
@@ -131,6 +132,23 @@
       background-color: #4CAF50;
       color: white;
     }
+
+
+    footer {
+      background: #979797;
+      width: 100%;
+      text-align: center;
+      margin: 0 auto;
+      display: flex;
+      justify-content: center;
+      bottom: 0px;
+      position: fixed;
+    }
+
+    footer p {
+      color: #016405;
+      text-align: center;
+    }
   </style>
 </head>
 
@@ -166,6 +184,14 @@
     </thead>
     <tbody id="voteTableBody"></tbody>
   </table>
+
+
+  <footer>
+    <p>
+      Designed by
+      <a href="http://github.com/theanishtar">Tran Huu Dang</a> @ DaviSoft
+    </p>
+  </footer>
 
   <script>
     const firebaseURL = 'https://music-vote-tsc-default-rtdb.firebaseio.com/votes'; // URL đến database của bạn

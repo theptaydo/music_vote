@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Music Search with Deezer</title>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f0f0f0;
+      text-align: center;
+    }
+
+    .search-box {
+      margin-top: 50px;
+    }
+
+    input[type="text"] {
+      padding: 10px;
+      width: 300px;
+      font-size: 16px;
+    }
+
+    button {
+      padding: 10px 15px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .results {
+      margin-top: 20px;
+    }
+
+    .result-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding: 10px;
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .result-item img {
+      width: 80px;
+      height: 80px;
+      border-radius: 5px;
+    }
+
+    .result-item div {
+      margin-left: 15px;
+      text-align: left;
+      flex-grow: 1;
+    }
+
+    .result-item h3 {
+      margin: 0;
+      font-size: 18px;
+    }
+
+    .result-item p {
+      margin: 5px 0 0;
+      color: #555;
+    }
+
+    .vote-button {
+      padding: 10px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .vote-button:disabled {
+      background-color: #ccc;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="search-box">
+    <input type="text" id="searchQuery" placeholder="Enter song name..." oninput="debounceSearch()" />
+  </div>
+
+  <div class="results" id="results"></div>
+
+  <script>
+    let timeoutId;
+
+    function debounceSearch() {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(searchMusic, 500); // Đợi 500ms sau khi người dùng ngừng gõ
+    }
+
+    function searchMusic() {
+      const query = document.getElementById('searchQuery').value;
+      if (query.trim().length === 0) {
+        clearResults(); // Xóa kết quả nếu không có nội dung trong ô tìm kiếm
+        return;
+      }
+
+      const script = document.createElement('script');
+      script.src = `https://api.deezer.com/search?q=${encodeURIComponent(query)}&output=jsonp&callback=handleResults`;
+      document.body.appendChild(script);
+    }
+
+    function handleResults(data) {
+      const resultsContainer = document.getElementById('results');
+      resultsContainer.innerHTML = '';  // Clear previous results
+
+      data.data.forEach(item => {
+        const songTitle = item.title;
+        const artistName = item.artist.name;
+        const thumbnail = item.album.cover_small;
+        const resultItemId = item.id; // Unique ID for each result item
+
+        const resultItem = document.createElement('div');
+        resultItem.className = 'result-item';
+
+        resultItem.innerHTML = `
+          <img src="${thumbnail}" alt="Thumbnail">
+          <div>
+            <h3>${songTitle}</h3>
+            <p>Artist: ${artistName}</p>
+          </div>
+          <button class="vote-button" id="vote-${resultItemId}" onclick="voteForSong(${resultItemId})">Vote</button>
+        `;
+
+        resultsContainer.appendChild(resultItem);
+      });
+    }
+
+    function voteForSong(songId) {
+      const voteButton = document.getElementById(`vote-${songId}`);
+      voteButton.disabled = true;  // Disable the button after voting
+      voteButton.innerText = 'Voted';  // Change the text to "Voted"
+
+      // You can add logic here to save the vote to your backend or update the state.
+      console.log(`Voted for song with ID: ${songId}`);
+    }
+
+    function clearResults() {
+      const resultsContainer = document.getElementById('results');
+      resultsContainer.innerHTML = '';  // Xóa kết quả trước đó
+    }
+  </script>
+
+</body>
+
+</html>

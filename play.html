@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Music Playlist</title>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f0f0f0;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .player {
+      margin-top: 50px;
+    }
+
+    .song-info {
+      margin-top: 20px;
+      font-size: 18px;
+    }
+
+    .controls {
+      margin-top: 20px;
+    }
+
+    button {
+      padding: 10px 20px;
+      margin: 0 10px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      background-color: #ccc;
+    }
+
+    .playlist {
+      margin-top: 30px;
+    }
+
+    .playlist ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .playlist li {
+      padding: 10px;
+      background-color: #fff;
+      margin: 5px 0;
+      border-radius: 5px;
+      cursor: pointer;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .playlist li:hover {
+      background-color: #4CAF50;
+      color: white;
+    }
+
+    .playlist li.active {
+      background-color: #4CAF50;
+      color: white;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>Music Playlist</h1>
+
+  <div class="player">
+    <audio id="audioPlayer" controls>
+      <source id="audioSource" src="" type="audio/mpeg">
+      Your browser does not support the audio element.
+    </audio>
+
+    <div class="song-info">
+      <p id="currentSongTitle">Select a song from the playlist</p>
+    </div>
+
+    <div class="controls">
+      <button id="prevBtn" onclick="playPrevSong()">Prev</button>
+      <button id="nextBtn" onclick="playNextSong()">Next</button>
+    </div>
+  </div>
+
+  <div class="playlist">
+    <h2>Playlist</h2>
+    <ul id="songList">
+      <!-- Danh sách bài hát sẽ được thêm ở đây bằng JavaScript -->
+    </ul>
+  </div>
+
+  <script>
+    // Danh sách bài hát
+    const songs = [
+      { title: "Song 1", src: "./assets/audio/Bèo Dạt Mây Trôi - Anh Khang x Quang Thắng _ Piano Cover.mp3" },
+      { title: "Song 2", src: "./assets/audio/Chuyện Đôi Ta - Emcee L (Da LAB) ft Muộii _ Yuriko Piano Cover.mp3" },
+      { title: "Song 3", src: "./assets/audio/HỒNG NHAN - JACK __ PIANO COVER __ BICH X LE.mp3" },
+      { title: "Song 4", src: "./assets/audio/NƠI NÀY CÓ ANH - SƠN TÙNG M-TP __ PIANO COVER __ AN COONG PIANO.mp3" },
+      { title: "Song 5", src: "./assets/audio/SƠN TÙNG M-TP _ CHÚNG TA CỦA HIỆN TẠI _ PIANO COVER  _ AN COONG.mp3" },
+      { title: "Song 6", src: "./assets/audio/Thiên Lý Ơi - Jack _ Piano Cover.mp3" },
+      { title: "Song 7", src: "./assets/audio/Đừng Làm Trái Tim Anh Đau - Sơn Tùng Mtp _ Piano Cover.mp3" },
+      { title: "Song 8", src: "./assets/audio/Lindsey Stirling - Senbonzakura (Kurousa Cover).mp3" },
+    ];
+
+    let currentSongIndex = 0;
+    const audioPlayer = document.getElementById('audioPlayer');
+    const audioSource = document.getElementById('audioSource');
+    const currentSongTitle = document.getElementById('currentSongTitle');
+    const songList = document.getElementById('songList');
+
+    // Tạo danh sách phát
+    function createPlaylist() {
+      songs.forEach((song, index) => {
+        const li = document.createElement('li');
+        li.textContent = song.title;
+        li.onclick = () => playSong(index);
+        songList.appendChild(li);
+      });
+    }
+
+    // Phát bài hát theo index
+    function playSong(index) {
+      currentSongIndex = index;
+      audioSource.src = songs[currentSongIndex].src;
+      audioPlayer.load();
+      audioPlayer.play();
+      updateSongInfo();
+      updatePlaylistUI();
+    }
+
+    // Cập nhật thông tin bài hát
+    function updateSongInfo() {
+      currentSongTitle.textContent = `Now playing: ${songs[currentSongIndex].title}`;
+    }
+
+    // Cập nhật UI danh sách phát
+    function updatePlaylistUI() {
+      const songItems = document.querySelectorAll('#songList li');
+      songItems.forEach((item, index) => {
+        if (index === currentSongIndex) {
+          item.classList.add('active');
+        } else {
+          item.classList.remove('active');
+        }
+      });
+    }
+
+    // Phát bài hát trước
+    function playPrevSong() {
+      currentSongIndex = (currentSongIndex - 1 + songs.length) % songs.length;
+      playSong(currentSongIndex);
+    }
+
+    // Phát bài hát tiếp theo
+    function playNextSong() {
+      currentSongIndex = (currentSongIndex + 1) % songs.length;
+      playSong(currentSongIndex);
+    }
+
+    // Phát bài hát đầu tiên khi tải trang
+    window.onload = () => {
+      createPlaylist();
+      playSong(currentSongIndex);
+    };
+  </script>
+
+</body>
+
+</html>

@@ -142,6 +142,7 @@
       display: flex;
       justify-content: center;
       bottom: 0px;
+      left: 0;
       position: fixed;
     }
 
@@ -154,10 +155,10 @@
 
 <body>
 
-  <h1>Thép Tây Đô - CHọn nhạc KV VPCT</h1>
+  <h1>Thép Tây Đô - Chọn nhạc KV VPCT</h1>
 
   <div class="search-box">
-    <input type="text" id="searchQuery" placeholder="Enter song name..." oninput="debounceSearch()" />
+    <input type="text" id="searchQuery" placeholder="Nhập tên bài hát..." oninput="debounceSearch()" />
   </div>
 
   <div class="results" id="results"></div>
@@ -165,10 +166,10 @@
   <!-- Modal Popup -->
   <div id="voteModal" class="modal">
     <div class="modal-content">
-      <h3>Enter Your Name to Vote</h3>
-      <input type="text" id="voterName" placeholder="Your name" />
-      <button onclick="submitVote()">Submit Vote</button>
-      <button onclick="closeModal()">Cancel</button>
+      <h3>Nhập tên của bạn để bình chọn</h3>
+      <input type="text" id="voterName" placeholder="Tên của bạn" />
+      <button onclick="submitVote()">Vình chọn</button>
+      <button onclick="closeModal()">Hủy</button>
     </div>
   </div>
 
